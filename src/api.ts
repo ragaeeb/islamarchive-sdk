@@ -1,4 +1,6 @@
-import { URL, URLSearchParams } from 'node:url';
+import { URL } from "node:url";
+
+type QueryParamValue = string | number | boolean | undefined;
 
 type ShamlaaBookResponse = {
     2: string; // page text
@@ -24,27 +26,45 @@ type ShamlaaTreeNode = {
     text: string;
 };
 
-const doGetRequest = async <T extends Record<string, any>>(queryParams: Record<string, any> = {}): Promise<T> => {
+/**
+ * Execute a JSON GET request against the islamarchive API.
+ *
+ * @template T The expected JSON response shape.
+ * @param queryParams Optional query string parameters to append to the request.
+ * @returns A promise resolving with the parsed JSON payload.
+ */
+const doGetRequest = async <T>(queryParams: Record<string, QueryParamValue> = {}): Promise<T> => {
     const url = new URL(`https://islamarchive.cc/actions.php`);
 
-    if (Object.keys(queryParams).length > 0) {
-        const params = new URLSearchParams();
+    Object.entries(queryParams).forEach(([key, value]) => {
+        if (value === undefined) {
+            return;
+        }
 
-        Object.entries(queryParams).forEach(([key, value]) => {
-            params.append(key, value.toString());
-        });
-
-        url.search = params.toString();
-    }
+        url.searchParams.set(key, String(value));
+    });
 
     const response = await fetch(url);
     return response.json();
 };
 
+/**
+ * Retrieve a specific page of a book from the islamarchive service.
+ *
+ * @param bookId Identifier of the requested book.
+ * @param pageId Optional identifier of the page within the book. When omitted, the first page is returned.
+ * @returns The raw Shamlaa API response for the requested page.
+ */
 export const getBookPage = async (bookId: number, pageId?: number): Promise<ShamlaaBookResponse> => {
-    return doGetRequest({ bookid: bookId, ...(pageId && { id: pageId }), p: 'Shamlaa_books', view: 'book' });
+    return doGetRequest({ bookid: bookId, ...(pageId && { id: pageId }), p: "Shamlaa_books", view: "book" });
 };
 
+/**
+ * Retrieve the bookmark tree for a book from the islamarchive service.
+ *
+ * @param bookId Identifier of the requested book.
+ * @returns A list of tree nodes describing the bookmark hierarchy.
+ */
 export const getBookTree = async (bookId: number): Promise<ShamlaaTreeNode[]> => {
-    return doGetRequest({ b: bookId, p: 'Shamlaa_treee_book' });
+    return doGetRequest({ b: bookId, p: "Shamlaa_treee_book" });
 };
