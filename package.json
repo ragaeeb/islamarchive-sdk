@@ -18,7 +18,7 @@
         "README.md",
         "LICENSE.MD"
     ],
-    "homepage": "https://github.com/ragaeeb/shamela",
+    "homepage": "https://github.com/ragaeeb/islamarchive-sdk",
     "keywords": [
         "islam",
         "shamela"
@@ -29,7 +29,7 @@
     "name": "islamarchive-sdk",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/ragaeeb/shamela.git"
+        "url": "git+https://github.com/ragaeeb/islamarchive-sdk.git"
     },
     "scripts": {
         "build": "tsdown",
